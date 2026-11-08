@@ -82,6 +82,8 @@ LLI and LAM_P agree with the published analysis. How the anode loss is split bet
 
 LLI and LAM_P are robust to the OCP choice. LAM_Gr is not: it changes by a factor of 20 depending on which graphite curve is used. Fit quality does not settle the question either. The three best fits (6.1–6.3 mV, all with the Wetjen graphite) give LAM_Gr ≈ 2.5 %, while fits only ~2 mV worse give ≈ 16 %. No OCP combination reproduces the published LAM_Si (every fit gives ≥ 35 %). The OCP curves come from the TUM-EES DegradationModeAnalysis repository (MIT; cite Rehm et al. 2026 and the original sources) and are not redistributed here.
 
+**08b, all eight cells.** Same 50-combination study for every cell (RPT0 vs RPT15, GITT-measured R). Results are in `results/08_ocp_sensitivity_summary.csv`. Across cells, the median spread due to OCP choice alone is LAM_Gr 12.3 pp, LAM_NE 9.3 pp, LAM_Si 7.8 pp, LAM_P 2.0 pp and LLI 1.2 pp. For the 10 °C and 25 °C cells (A–E), LAM_Gr ranges over 10–15 pp. For the 40 °C cells (F–H), only 2–3 combinations fit within 10 mV, so the spread there is not well sampled. In all eight cells, LLI is 1–4 pp below the published value and LAM_Si is 2–12 pp above it.
+
 ## Limitations (current version)
 - Only the ohmic polarisation is modelled. Diffusion and charge-transfer overpotentials at C/10–C/20 are not, so residuals are correlated and credible intervals on real data will be too narrow unless a discrepancy term is added (planned).
 - Graphite is treated as hysteresis-free. Si hysteresis is a fixed gap scaled by `hys`; there is no path-dependent (scanning-curve) model yet.

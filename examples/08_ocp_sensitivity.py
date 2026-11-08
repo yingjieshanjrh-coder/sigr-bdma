@@ -43,7 +43,7 @@ def best_map(cell, branch, R, starts):
     return best
 
 
-def main(root, tum, cell="D"):
+def run_cell(root, tum, cell="D", verbose=True):
     idx, sets = kirkaldy2022_branches(root, cell)
     R = interpolate_resistance(kirkaldy2022_resistance(root, cell), idx)
     first, last = idx[0], idx[-1]
@@ -72,9 +72,13 @@ def main(root, tum, cell="D"):
                    Si_share0=z0[1] / (z0[0] + z0[1]))
         row.update({n: 100 * v for n, v in zip(s.MODE_NAMES, m)})
         rows.append(row)
-        print(f"{gn:10s} {sn:14s} rms {row['rms0_mV']:5.1f}/{row['rms1_mV']:5.1f} mV  "
-              + "  ".join(f"{n}={row[n]:5.1f}" for n in s.MODE_NAMES))
+        if verbose:
+            print(f"{gn:10s} {sn:14s} rms {row['rms0_mV']:5.1f}/{row['rms1_mV']:5.1f} mV  "
+                  + "  ".join(f"{n}={row[n]:5.1f}" for n in s.MODE_NAMES))
     res = pd.DataFrame(rows)
+    res["cell"] = cell
+    for n in s.MODE_NAMES:
+        res[f"{n}_pub"] = 100 * pub[KIRKALDY_COLMAP[n]].loc[last]
     os.makedirs("results", exist_ok=True)
     res.to_csv(f"results/08_ocp_sensitivity_cell{cell}.csv", index=False)
 
@@ -90,5 +94,39 @@ def main(root, tum, cell="D"):
     return res
 
 
+def plausible(res, rms_max=10.0):
+    r = res.copy()
+    r["rms"] = 0.5 * (r.rms0_mV + r.rms1_mV)
+    ok = (r[["LAM_Gr", "LAM_Si", "LAM_P"]].min(axis=1) > -2) & (r.LAM_Si < 95) & (r.rms <= rms_max)
+    return r[ok]
+
+
+def main(root, tum, cells="ABCDEFGH"):
+    allres = []
+    for c in cells:
+        print(f"== cell {c}")
+        allres.append(run_cell(root, tum, c, verbose=False))
+    res = pd.concat(allres)
+    res.to_csv("results/08_ocp_sensitivity_all.csv", index=False)
+    print("\nPer cell, plausible fits (no mode < -2 %, LAM_Si < 95 %, mean RMS <= 10 mV):")
+    print(f"{'cell':4s} {'n':>3s} " + " ".join(f"{m + ' range':>16s} {'pub':>5s}" for m in s.MODE_NAMES))
+    rows = []
+    for c, g in res.groupby("cell"):
+        p = plausible(g)
+        line = f"{c:4s} {len(p):3d} "
+        row = {"cell": c, "n": len(p)}
+        for m in s.MODE_NAMES:
+            lo, hi, pubv = p[m].min(), p[m].max(), g[f"{m}_pub"].iloc[0]
+            line += f"{lo:7.1f} - {hi:6.1f} {pubv:5.1f} "
+            row.update({f"{m}_min": lo, f"{m}_max": hi, f"{m}_span": hi - lo, f"{m}_pub": pubv})
+        rows.append(row)
+        print(line)
+    summ = pd.DataFrame(rows)
+    summ.to_csv("results/08_ocp_sensitivity_summary.csv", index=False)
+    print("\nmedian span across cells (pp): " + "  ".join(
+        f"{m}={summ[f'{m}_span'].median():.1f}" for m in s.MODE_NAMES))
+    return res
+
+
 if __name__ == "__main__":
-    main(sys.argv[1], sys.argv[2], *(sys.argv[3:4] or ["D"]))
+    main(sys.argv[1], sys.argv[2], *(sys.argv[3:4] or ["ABCDEFGH"]))
