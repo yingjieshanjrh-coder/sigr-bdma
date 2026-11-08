@@ -51,7 +51,13 @@ def default_params(guess: dict, fit_R=True, fit_w=False, fit_hys=False, R_scale=
 
 class Problem:
     def __init__(self, cell: Cell, branches, params, fixed=None, cap_sd=0.01,
-                 v_scale=1e-3):
+                 v_scale=1e-3, noise="iid"):
+        """noise: "iid" (independent Gaussian residuals) or "ar1" (first-order
+        autoregressive residuals, a simple model-discrepancy term: systematic misfit
+        shows up as phi -> 1 and widens the posterior instead of being read as signal)."""
+        if noise not in ("iid", "ar1"):
+            raise ValueError("noise must be 'iid' or 'ar1'")
+        self.noise = noise
         self.cell = cell
         self.branches = list(branches)
         self.params = list(params)
@@ -98,22 +104,43 @@ class Problem:
         sol = least_squares(self.ls_residuals, x0, bounds=(self.lo, self.hi),
                             x_scale="jac", diff_step=1e-4)
         x = sol.x
-        sig = []
+        sig, phi = [], []
         for rr in self._branch_residuals(x):
-            sig.append(np.log(max(np.std(rr[0]), 1e-4)) if rr is not None else np.log(1e-2))
-        return np.append(x, sig)
+            if rr is None:
+                sig.append(np.log(1e-2)); phi.append(0.5)
+                continue
+            r = rr[0]
+            ph = float(np.clip(np.corrcoef(r[:-1], r[1:])[0, 1], 0.0, 0.98)) if len(r) > 3 else 0.0
+            innov = r[1:] - ph * r[:-1] if self.noise == "ar1" else r
+            sig.append(np.log(max(np.std(innov), 1e-5)))
+            phi.append(ph)
+        return np.concatenate([x, sig, phi if self.noise == "ar1" else []])
 
     # -- posterior ----------------------------------------------------------------
+    def split(self, z):
+        k = len(self.names)
+        x, ls = z[:k], z[k:k + self.nb]
+        phi = z[k + self.nb:k + 2 * self.nb] if self.noise == "ar1" else np.zeros(self.nb)
+        return x, ls, phi
+
     def log_post(self, z):
-        x, ls = z[: len(self.names)], z[len(self.names):]
-        if np.any(x < self.lo) or np.any(x > self.hi) or np.any(ls < -12) or np.any(ls > 0):
+        x, ls, phi = self.split(z)
+        if (np.any(x < self.lo) or np.any(x > self.hi) or np.any(ls < -12) or np.any(ls > 0)
+                or np.any(phi < 0) or np.any(phi > 0.995)):
             return -np.inf
         lp = sum(p.logprior(v) for p, v in zip(self.params, x))
-        for rr, s in zip(self._branch_residuals(x), ls):
+        for rr, s, ph in zip(self._branch_residuals(x), ls, phi):
             if rr is None:
                 return -np.inf
             r, dq = rr
-            lp += -0.5 * np.sum(r ** 2) * np.exp(-2 * s) - len(r) * s
+            if ph > 0:
+                e = np.empty_like(r)
+                e[0] = r[0] * np.sqrt(1 - ph ** 2)
+                e[1:] = r[1:] - ph * r[:-1]
+                lp += 0.5 * np.log(1 - ph ** 2)
+            else:
+                e = r
+            lp += -0.5 * np.sum(e ** 2) * np.exp(-2 * s) - len(r) * s
             lp += -0.5 * (dq / self.cap_sd) ** 2
         return lp
 
@@ -136,7 +163,9 @@ class Problem:
         for p in self.params:
             if p.name in CAPACITY_NAMES or p.name == "w":
                 log_vol -= np.log(p.upper - p.lower)
-        log_vol -= len(z_map[len(self.names):]) * np.log(12.0)   # log-sigma in (-12, 0)
+        log_vol -= self.nb * np.log(12.0)                          # log-sigma in (-12, 0)
+        if self.noise == "ar1":
+            log_vol -= self.nb * np.log(0.995)                     # phi in (0, 0.995)
         return f0 + log_vol + 0.5 * d * np.log(2 * np.pi) - 0.5 * logdet
 
 

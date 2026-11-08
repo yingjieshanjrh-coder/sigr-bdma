@@ -10,3 +10,4 @@ from .workflow import fit_series, fit_state  # noqa: F401
 
 __version__ = "0.1.0"
 from .ocp_library import graphite_ai2020, si_verbrugge2016  # noqa: F401,E402
+from . import datasets  # noqa: F401,E402

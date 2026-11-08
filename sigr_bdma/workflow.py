@@ -5,12 +5,12 @@ from .inference import Problem, default_params
 
 
 def fit_state(cell, branches, guess, fit_R=True, fit_w=False, fit_hys=False, fixed=None,
-              n_walkers=32, n_steps=1500, burn=600, seed=0, verbose=True):
+              noise="iid", n_walkers=32, n_steps=1500, burn=600, seed=0, verbose=True):
     params = default_params(guess, fit_R=fit_R, fit_w=fit_w, fit_hys=fit_hys)
     fixed = dict(fixed or {})
     if not fit_R:
         fixed.setdefault("R", 0.0)
-    prob = Problem(cell, branches, params, fixed=fixed)
+    prob = Problem(cell, branches, params, fixed=fixed, noise=noise)
     z0 = prob.fit_map()
     post = prob.sample(z0, n_walkers, n_steps, burn, seed)
     post.z_map = z0

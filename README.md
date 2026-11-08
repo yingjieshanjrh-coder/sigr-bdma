@@ -63,6 +63,11 @@ When the correct branch OCP and the true R are given, a discharge-only fit is al
 
 LLI and LAM_P agree with the published analysis. How the anode loss is split between graphite and Si does **not** agree, and the credible intervals do not cover the published values. The fit residuals are 7–9 mV RMS and systematic. Together this shows that the Gr/Si split is governed by the choice of component OCPs and by model discrepancy, not by measurement noise. The intervals shown above reflect noise only and are therefore too narrow. The next step is to add a model-discrepancy term and Si-OCP mixtures.
 
+**06, real data: all eight 0–100 % SoC cells (10/25/40 °C, RPT 0/3/6/9/12/15).** Results are in `results/06_kirkaldy_all_cells.csv`.
+- With independent (iid) noise, LAM_P agrees with the published values for 7 of 8 cells. LLI agrees to within about 1–2.5 pp, but the published value lies inside our 95 % interval for none of the cells.
+- LAM_Si comes out **10–15 pp higher than published in every cell** (42–49 % vs 30–42 %). That is a systematic offset, not scatter, and is consistent with the choice of Si/graphite OCP setting the Gr/Si split.
+- The fit residuals are 9–10 mV RMS. An AR(1) discrepancy model (`noise="ar1"`) drives φ to its upper bound (≈ 0.994). It widens the LAM_Si intervals (median width 4 → 14 pp) but also produces an artefact, LAM_P ≈ 20 % in every cell. A simple AR(1) term is therefore **not** an adequate discrepancy model for these data. It is kept as an experimental option.
+
 ## Limitations (current version)
 - Only the ohmic polarisation is modelled. Diffusion and charge-transfer overpotentials at C/10–C/20 are not, so residuals are correlated and credible intervals on real data will be too narrow unless a discrepancy term is added (planned).
 - Graphite is treated as hysteresis-free. Si hysteresis is a fixed gap scaled by `hys`; there is no path-dependent (scanning-curve) model yet.
