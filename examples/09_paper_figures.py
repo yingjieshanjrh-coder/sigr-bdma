@@ -9,6 +9,7 @@ import pandas as pd
 BLUE, ORANGE = "#2a78d6", "#eb6834"
 INK, MUTED, GRID = "#0b0b0b", "#52514e", "#e4e3df"
 TEMPS = {"A": 10, "B": 10, "C": 10, "D": 25, "E": 25, "F": 40, "G": 40, "H": 40}
+TEMPS_030 = {"A": 10, "B": 10, "J": 10, "D": 25, "E": 25, "F": 25, "K": 40, "L": 40, "M": 40}
 MODES = [("LLI", "LLI"), ("LAM_P", "LAM$_{PE}$"), ("LAM_Si", "LAM$_{Si}$"),
          ("LAM_NE", "LAM$_{NE}$"), ("LAM_Gr", "LAM$_{Gr}$")]
 plt.rcParams.update({"font.size": 8, "axes.edgecolor": MUTED, "axes.labelcolor": INK,
@@ -22,24 +23,23 @@ def plausible(r, rms_max=10.0):
     return r[ok]
 
 
-def fig_ranges(res, path):
-    cells = sorted(res.cell.unique())
+def fig_ranges(res, path, temps=TEMPS):
+    cells = sorted(res.cell.unique(), key=lambda c: (temps[c], c))
     fig, axes = plt.subplots(1, len(MODES), figsize=(7.2, 2.9), sharey=True)
     for ax, (m, lab) in zip(axes, MODES):
         for i, c in enumerate(cells):
             p = plausible(res[res.cell == c])
             y = len(cells) - 1 - i
             ax.plot([p[m].min(), p[m].max()], [y, y], color=BLUE, lw=3, solid_capstyle="round")
-            ax.plot(res[res.cell == c][f"{m}_pub"].iloc[0], y, "D", ms=4, color=ORANGE,
-                    mec="white", mew=0.8, zorder=3)
+            ax.plot(res[res.cell == c][f"{m}_pub"].iloc[0], y, "D", ms=4.5, mfc="none", mec=ORANGE, mew=1.3, zorder=3)
         ax.set_title(lab, color=INK)
-        ax.set_xlabel("loss at RPT15 (%)")
+        ax.set_xlabel("loss at last RPT (%)")
         ax.grid(axis="x", color=GRID, lw=0.6)
         ax.set_axisbelow(True)
     axes[0].set_yticks(range(len(cells)))
-    axes[0].set_yticklabels([f"{c} ({TEMPS[c]} °C)" for c in reversed(cells)])
+    axes[0].set_yticklabels([f"{c} ({temps[c]} °C)" for c in reversed(cells)])
     h1, = axes[0].plot([], [], color=BLUE, lw=3)
-    h2, = axes[0].plot([], [], "D", ms=4, color=ORANGE)
+    h2, = axes[0].plot([], [], "D", ms=4.5, mfc="none", mec=ORANGE, mew=1.3)
     fig.legend([h1, h2], ["range over OCP choices (fits ≤ 10 mV)", "published (least squares)"],
                frameon=False, loc="upper center", ncol=2, fontsize=7)
     fig.tight_layout(rect=(0, 0, 1, 0.9))
@@ -71,4 +71,7 @@ if __name__ == "__main__":
     os.makedirs("figures", exist_ok=True)
     fig_ranges(res, "figures/fig_mode_ranges.png")
     fig_rms_vs_gr(res, "figures/fig_rms_vs_lam_gr.png")
-    print("written figures/fig_mode_ranges.png, figures/fig_rms_vs_lam_gr.png")
+    if os.path.exists("results/08_ocp_sensitivity_030_all.csv"):
+        r030 = pd.read_csv("results/08_ocp_sensitivity_030_all.csv")
+        fig_ranges(r030, "figures/fig_mode_ranges_030.png", TEMPS_030)
+    print("figures written to figures/")

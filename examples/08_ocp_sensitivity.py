@@ -43,9 +43,9 @@ def best_map(cell, branch, R, starts):
     return best
 
 
-def run_cell(root, tum, cell="D", verbose=True):
-    idx, sets = kirkaldy2022_branches(root, cell)
-    R = interpolate_resistance(kirkaldy2022_resistance(root, cell), idx)
+def run_cell(root, tum, cell="D", verbose=True, soc="0-100% SoC"):
+    idx, sets = kirkaldy2022_branches(root, cell, soc)
+    R = interpolate_resistance(kirkaldy2022_resistance(root, cell, soc), idx)
     first, last = idx[0], idx[-1]
     br0, br1 = sets[0][0], sets[-1][0]
     lib = load_tum_ocps(tum)
@@ -54,7 +54,7 @@ def run_cell(root, tum, cell="D", verbose=True):
     sis = {"Verbrugge2016": s.si_verbrugge2016()}
     sis.update({n: s.SiOCP(n, d["lith"], d["delith"]) for n, d in lib["silicon"].items()
                 if "lith" in d and "delith" in d})
-    pub = kirkaldy2022_published_modes(root, cell)
+    pub = kirkaldy2022_published_modes(root, cell, soc)
 
     rows = []
     for (gn, gf), (sn, si) in itertools.product(graphites.items(), sis.items()):
@@ -77,10 +77,12 @@ def run_cell(root, tum, cell="D", verbose=True):
                   + "  ".join(f"{n}={row[n]:5.1f}" for n in s.MODE_NAMES))
     res = pd.DataFrame(rows)
     res["cell"] = cell
+    res["soc"] = soc
     for n in s.MODE_NAMES:
         res[f"{n}_pub"] = 100 * pub[KIRKALDY_COLMAP[n]].loc[last]
     os.makedirs("results", exist_ok=True)
-    res.to_csv(f"results/08_ocp_sensitivity_cell{cell}.csv", index=False)
+    tag = "" if soc.startswith("0-100") else "_030"
+    res.to_csv(f"results/08_ocp_sensitivity{tag}_cell{cell}.csv", index=False)
 
     res["rms"] = 0.5 * (res.rms0_mV + res.rms1_mV)
     good = res[res.rms <= 1.25 * res.rms.min()]
@@ -101,13 +103,14 @@ def plausible(res, rms_max=10.0):
     return r[ok]
 
 
-def main(root, tum, cells="ABCDEFGH"):
+def main(root, tum, cells="ABCDEFGH", soc="0-100% SoC"):
+    tag = "" if soc.startswith("0-100") else "_030"
     allres = []
     for c in cells:
-        print(f"== cell {c}")
-        allres.append(run_cell(root, tum, c, verbose=False))
+        print(f"== cell {c} ({soc})")
+        allres.append(run_cell(root, tum, c, verbose=False, soc=soc))
     res = pd.concat(allres)
-    res.to_csv("results/08_ocp_sensitivity_all.csv", index=False)
+    res.to_csv(f"results/08_ocp_sensitivity{tag}_all.csv", index=False)
     print("\nPer cell, plausible fits (no mode < -2 %, LAM_Si < 95 %, mean RMS <= 10 mV):")
     print(f"{'cell':4s} {'n':>3s} " + " ".join(f"{m + ' range':>16s} {'pub':>5s}" for m in s.MODE_NAMES))
     rows = []
@@ -122,11 +125,12 @@ def main(root, tum, cells="ABCDEFGH"):
         rows.append(row)
         print(line)
     summ = pd.DataFrame(rows)
-    summ.to_csv("results/08_ocp_sensitivity_summary.csv", index=False)
+    summ.to_csv(f"results/08_ocp_sensitivity{tag}_summary.csv", index=False)
     print("\nmedian span across cells (pp): " + "  ".join(
         f"{m}={summ[f'{m}_span'].median():.1f}" for m in s.MODE_NAMES))
     return res
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], sys.argv[2], *(sys.argv[3:4] or ["ABCDEFGH"]))
+    # optional: argv[3] = cells, argv[4] = "0-30% SoC"
+    main(sys.argv[1], sys.argv[2], *(sys.argv[3:4] or ["ABCDEFGH"]), *(sys.argv[4:5] or ["0-100% SoC"]))

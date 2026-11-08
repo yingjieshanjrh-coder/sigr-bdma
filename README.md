@@ -84,6 +84,10 @@ LLI and LAM_P are robust to the OCP choice. LAM_Gr is not: it changes by a facto
 
 **08b, all eight cells.** Same 50-combination study for every cell (RPT0 vs RPT15, GITT-measured R). Results are in `results/08_ocp_sensitivity_summary.csv`. Across cells, the median spread due to OCP choice alone is LAM_Gr 12.3 pp, LAM_NE 9.3 pp, LAM_Si 7.8 pp, LAM_P 2.0 pp and LLI 1.2 pp. For the 10 °C and 25 °C cells (A–E), LAM_Gr ranges over 10–15 pp. For the 40 °C cells (F–H), only 2–3 combinations fit within 10 mV, so the spread there is not well sampled. In all eight cells, LLI is 1–4 pp below the published value and LAM_Si is 2–12 pp above it.
 
+**08c, 0–30 % SoC cells (9 cells, RPT0 vs last RPT).** Results are in `results/08_ocp_sensitivity_030_summary.csv` and `figures/fig_mode_ranges_030.png`. The picture is the same: the median spread is LLI 1.4 pp, LAM_P 2.8 pp, LAM_Si 9.7 pp, LAM_NE 16.0 pp and LAM_Gr 19.3 pp. In the strongly degraded cells (LLI 40–54 %), LLI and LAM_P agree with the published values to within about 2–4 pp, while LAM_NE and LAM_Gr are 15–40 pp lower than published.
+
+**10, robustness.** The output is in `results/10_summary_stats.txt`. Whichever RMS cut-off is used (8–15 mV), LAM_Gr spreads 8–35× more than LLI. For LAM_Gr and LAM_NE, the OCP-induced spread is 4–5× the noise-only 95 % interval of a single-OCP Bayesian fit. For LLI and LAM_P it is smaller than that interval.
+
 ## Limitations (current version)
 - Only the ohmic polarisation is modelled. Diffusion and charge-transfer overpotentials at C/10 are not, so residuals are correlated (9–10 mV RMS on the LG M50T data) and the noise-only credible intervals are too narrow. The AR(1) option does not fix this (see 06).
 - Graphite is treated as hysteresis-free. Si hysteresis is a fixed gap scaled by `hys`; there is no path-dependent (scanning-curve) model.
