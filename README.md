@@ -85,17 +85,19 @@ LLI and LAM_P are robust to the OCP choice. LAM_Gr is not: it changes by a facto
 **08b, all eight cells.** Same 50-combination study for every cell (RPT0 vs RPT15, GITT-measured R). Results are in `results/08_ocp_sensitivity_summary.csv`. Across cells, the median spread due to OCP choice alone is LAM_Gr 12.3 pp, LAM_NE 9.3 pp, LAM_Si 7.8 pp, LAM_P 2.0 pp and LLI 1.2 pp. For the 10 °C and 25 °C cells (A–E), LAM_Gr ranges over 10–15 pp. For the 40 °C cells (F–H), only 2–3 combinations fit within 10 mV, so the spread there is not well sampled. In all eight cells, LLI is 1–4 pp below the published value and LAM_Si is 2–12 pp above it.
 
 ## Limitations (current version)
-- Only the ohmic polarisation is modelled. Diffusion and charge-transfer overpotentials at C/10–C/20 are not, so residuals are correlated and credible intervals on real data will be too narrow unless a discrepancy term is added (planned).
-- Graphite is treated as hysteresis-free. Si hysteresis is a fixed gap scaled by `hys`; there is no path-dependent (scanning-curve) model yet.
-- The built-in Si curves are placeholders. The graphite and NMC811 OCPs are the Chen2020 fits (LG M50).
-- Not yet validated on experimental data. The next step is the LG M50T dataset of Kirkaldy et al. (Zenodo 7235857), which has C/10 charge and discharge at every RPT.
+- Only the ohmic polarisation is modelled. Diffusion and charge-transfer overpotentials at C/10 are not, so residuals are correlated (9–10 mV RMS on the LG M50T data) and the noise-only credible intervals are too narrow. The AR(1) option does not fix this (see 06).
+- Graphite is treated as hysteresis-free. Si hysteresis is a fixed gap scaled by `hys`; there is no path-dependent (scanning-curve) model.
+- The Kirkaldy et al. dataset contains C/10 discharge curves only, so the joint charge/discharge fit has so far been tested on synthetic data only.
+- The `placeholder_si` curves are for tests only. Real analyses use `si_verbrugge2016`, `graphite_ai2020` or the TUM-EES collection (`load_tum_ocps`).
 
 ## Related work
 - Kirkaldy et al., *ACS Appl. Energy Mater.* 2022: composite-electrode OCV fitting, LG M50T dataset.
 - Rehm et al., *J. Power Sources* 2026: DMA for Si–Gr blends; the Si OCP generated from blend and graphite half-cells. Their study shows modes change by more than 2× with the choice of Si OCP.
 - "Phantom LAM and LLI", arXiv:2512.19773: resistance and hysteresis bias in voltage-curve DMA (deterministic fits).
 - Lin & Khoo, *J. Power Sources*: Fisher-information identifiability for single-material electrodes.
-- Chen et al., *J. Electrochem. Soc.* 2020: graphite and NMC811 OCP fits.
+- Chen et al., *J. Electrochem. Soc.* 2020: NMC811 OCP fit.
+- Ai et al., *J. Electrochem. Soc.* 2020 (graphite OCP); Verbrugge et al., *J. Electrochem. Soc.* 2016 (Si OCP), both as distributed with PyBaMM.
+- TUM-EES DegradationModeAnalysis (Rehm et al. 2026): collection of literature graphite and Si OCPs used in 08.
 
 ## License
 MIT License. Copyright (c) 2026 Yingjie Shan.
