@@ -83,3 +83,11 @@ def test_ocp_library():
     si = s.si_verbrugge2016()
     assert np.all(np.diff(si.lith(x)) < 0) and np.all(si.delith(x) > si.lith(x))
     assert 0.0 < s.graphite_ai2020(0.5) < 0.3
+
+
+def test_pulse_resistance():
+    t = np.arange(0, 20, 0.1)
+    I = np.where(t >= 10, -2.5, 0.0)
+    V = 4.0 + np.where(t >= 10, -2.5 * 0.03, 0.0)
+    p = s.io.pulse_resistance(t, I, V)
+    assert len(p) == 1 and abs(p[0, 2] - 0.03) < 1e-9

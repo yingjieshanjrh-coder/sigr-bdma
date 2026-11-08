@@ -68,6 +68,8 @@ LLI and LAM_P agree with the published analysis. How the anode loss is split bet
 - LAM_Si comes out **10–15 pp higher than published in every cell** (42–49 % vs 30–42 %). That is a systematic offset, not scatter, and is consistent with the choice of Si/graphite OCP setting the Gr/Si split.
 - The fit residuals are 9–10 mV RMS. An AR(1) discrepancy model (`noise="ar1"`) drives φ to its upper bound (≈ 0.994). It widens the LAM_Si intervals (median width 4 → 14 pp) but also produces an artefact, LAM_P ≈ 20 % in every cell. A simple AR(1) term is therefore **not** an adequate discrepancy model for these data. It is kept as an experimental option.
 
+**07, measured resistance (cell D).** We extract the instantaneous resistance from the GITT pulses: it rises from 26.4 to 31.6 mΩ over the test. When R is instead inferred from discharge-only data, it climbs to ~70 mΩ, because it absorbs all polarisation, not just the ohmic part. Fixing R at the measured values barely changes the modes: at RPT15, LAM_Si = 40.1 % [37.8, 42.5] vs 31.2 % published. **The Si offset is therefore not a resistance artefact**; it comes from the component OCPs.
+
 ## Limitations (current version)
 - Only the ohmic polarisation is modelled. Diffusion and charge-transfer overpotentials at C/10–C/20 are not, so residuals are correlated and credible intervals on real data will be too narrow unless a discrepancy term is added (planned).
 - Graphite is treated as hysteresis-free. Si hysteresis is a fixed gap scaled by `hys`; there is no path-dependent (scanning-curve) model yet.

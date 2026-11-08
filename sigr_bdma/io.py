@@ -60,3 +60,22 @@ def split_cycler_log(t, I, V, target_current, rel_tol=0.1, min_duration=600.0,
                                               label=f"{d}@{t[start]:.0f}s"))
             start = None
     return out
+
+
+def pulse_resistance(t, I, V, min_current=0.5, rest_current=0.01, pre_gap=0.1):
+    """Instantaneous (ohmic) resistance from rest-to-pulse current steps.
+
+    R = (V_first_on - V_rest) / (I_on - 0), with V_rest the last rest sample at least
+    `pre_gap` s before the step (robust to loggers that record the step one sample
+    early). Returns array of (time, V_rest, R_ohm) for every step to |I| >= min_current.
+    """
+    t, I, V = (np.asarray(a, float) for a in (t, I, V))
+    out = []
+    on = np.abs(I) >= min_current
+    for k in np.where(on[1:] & ~on[:-1])[0] + 1:
+        prev = np.where((t <= t[k] - pre_gap) & (np.abs(I) < rest_current))[0]
+        if len(prev) == 0 or t[k] - t[prev[-1]] > 2.0:
+            continue
+        j = prev[-1]
+        out.append((t[k], V[j], (V[k] - V[j]) / (I[k] - I[j])))
+    return np.array(out).reshape(-1, 3)

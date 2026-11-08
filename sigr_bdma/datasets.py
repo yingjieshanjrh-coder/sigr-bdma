@@ -7,7 +7,9 @@ import re
 
 import pandas as pd
 
-from .io import branch_from_arrays
+import numpy as np
+
+from .io import branch_from_arrays, pulse_resistance
 
 
 def kirkaldy2022_branches(root, cell, soc="0-100% SoC", n=300):
@@ -38,3 +40,25 @@ def kirkaldy2022_published_modes(root, cell, soc="0-100% SoC"):
 KIRKALDY_COLMAP = {"LAM_Gr": "LAM NE_Gr", "LAM_Si": "LAM NE_Si", "LAM_NE": "LAM NE_tot",
                    "LAM_P": "LAM PE", "LLI": "LLI"}
 KIRKALDY_TEMPS = {"A": 10, "B": 10, "C": 10, "D": 25, "E": 25, "F": 40, "G": 40, "H": 40}
+
+
+def kirkaldy2022_resistance(root, cell, soc="0-100% SoC"):
+    """Median instantaneous resistance (ohm) per RPT from the 5-pulse GITT files
+    (0.5C pulses from rest). Returns dict rpt -> R. RPTs without GITT are not included;
+    see `interpolate_resistance`."""
+    d = os.path.join(root, "Timeseries Data from RPTs", soc, "GITT Voltage Curves", f"Cell {cell}")
+    out = {}
+    for f in glob.glob(os.path.join(d, "*5-pulse GITT*.csv")):
+        if "25-pulse" in f:
+            continue
+        df = pd.read_csv(f)
+        p = pulse_resistance(df["Time (s)"], df["Current (mA)"] / 1000, df["Voltage (V)"])
+        p = p[p[:, 2] > 0]
+        if len(p):
+            out[int(re.search(r"RPT(\d+)", f).group(1))] = float(np.median(p[:, 2]))
+    return dict(sorted(out.items()))
+
+
+def interpolate_resistance(R_by_rpt, rpts):
+    k = np.array(list(R_by_rpt)); v = np.array(list(R_by_rpt.values()))
+    return {r: float(np.interp(r, k, v)) for r in rpts}
