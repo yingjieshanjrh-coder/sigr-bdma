@@ -1,0 +1,17 @@
+== A (this work) ==
+    MAP: Q_Gr=4.991, Q_Si=1.004, Q_P=5.6, Q_Li=5.5, R=0.02982 | acc=0.48
+    MAP: Q_Gr=4.748, Q_Si=0.7524, Q_P=5.433, Q_Li=4.95, R=0.04495 | acc=0.48
+== B1 conventional ==
+    MAP: Q_Gr=3.683, Q_Si=1.952, Q_P=5.362, Q_Li=5.409 | acc=0.55
+    MAP: Q_Gr=3.657, Q_Si=1.477, Q_P=5.136, Q_Li=4.878 | acc=0.56
+== B2 best practice ==
+    MAP: Q_Gr=5.001, Q_Si=1.002, Q_P=5.599, Q_Li=5.499 | acc=0.56
+    MAP: Q_Gr=4.745, Q_Si=0.7541, Q_P=5.435, Q_Li=4.95 | acc=0.55
+
+Degradation modes, % (posterior mean ± sd; truth in first column)
+mode     truth            A (this work)         B1 conventional        B2 best practice
+LAM_Gr     5.0            4.9 ±   0.2             0.3 ±   6.0             5.1 ±   0.3  
+LAM_Si    25.0           25.1 ±   0.3            24.4 ±   4.5            24.8 ±   0.5  
+LAM_NE     8.3            8.3 ±   0.1             8.8 ±   2.2             8.4 ±   0.2  
+LAM_P      3.0            3.0 ±   0.0             4.2 ±   0.7             2.9 ±   0.1  
+LLI       10.0           10.0 ±   0.0             9.8 ±   0.2            10.0 ±   0.0  

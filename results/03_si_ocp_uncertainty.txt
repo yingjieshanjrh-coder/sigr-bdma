@@ -1,0 +1,21 @@
+== fixed-A ==
+    MAP: Q_Gr=5.256, Q_Si=0.8851, Q_P=5.569, Q_Li=5.496, R=0.03003 | acc=0.48
+    MAP: Q_Gr=4.929, Q_Si=0.6694, Q_P=5.416, Q_Li=4.95, R=0.04493 | acc=0.48
+== fixed-B ==
+    MAP: Q_Gr=4.484, Q_Si=1.212, Q_P=5.645, Q_Li=5.504, R=0.03455 | acc=0.48
+    MAP: Q_Gr=4.357, Q_Si=0.9194, Q_P=5.471, Q_Li=4.953, R=0.04836 | acc=0.48
+== mixture ==
+    MAP: Q_Gr=5.001, Q_Si=0.9988, Q_P=5.598, Q_Li=5.499, R=0.03014, w=0.3535 | acc=0.46
+    MAP: Q_Gr=4.738, Q_Si=0.7556, Q_P=5.437, Q_Li=4.952, R=0.04505, w=0.3612 | acc=0.46
+    w (fresh) = 0.353 ± 0.010   (true 0.35)
+    w (aged) = 0.362 ± 0.010   (true 0.35)
+
+Laplace log-evidence A=4546.6, B=4086.1 -> BMA weights [1. 0.]
+
+Degradation modes, % (mean ± sd)
+mode     truth            fixed-A           fixed-B           mixture          BMA(A,B)
+LAM_Gr     5.0        6.1 ±  0.3       5.2 ±  0.9       5.3 ±  0.2       6.1 ±  0.3
+LAM_Si    25.0       24.5 ±  0.8      20.1 ±  1.9      24.3 ±  0.5      24.5 ±  0.8
+LAM_NE     8.3        8.8 ±  0.2       8.1 ±  0.3       8.4 ±  0.1       8.8 ±  0.2
+LAM_P      3.0        2.8 ±  0.1       2.7 ±  0.2       2.9 ±  0.1       2.8 ±  0.1
+LLI       10.0        9.9 ±  0.0      10.0 ±  0.1      10.0 ±  0.0       9.9 ±  0.0
