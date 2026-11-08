@@ -76,3 +76,10 @@ def test_split_cycler_log():
     brs = s.split_cycler_log(t, I, V, 0.5)
     assert [b.direction for b in brs] == ["charge", "discharge"]
     assert abs(brs[0].span - ch.span) < 0.02 and abs(brs[1].span - dis.span) < 0.02
+
+
+def test_ocp_library():
+    x = np.linspace(0.02, 0.98, 200)
+    si = s.si_verbrugge2016()
+    assert np.all(np.diff(si.lith(x)) < 0) and np.all(si.delith(x) > si.lith(x))
+    assert 0.0 < s.graphite_ai2020(0.5) < 0.3

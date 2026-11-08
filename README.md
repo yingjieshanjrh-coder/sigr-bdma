@@ -51,6 +51,18 @@ When the correct branch OCP and the true R are given, a discharge-only fit is al
 
 **03, Si-OCP uncertainty.** The true Si curve lies between two candidates. Fixing either candidate biases LAM_Gr or LAM_Si and still reports small error bars. Laplace BMA puts all its weight on one candidate and inherits that bias. The mixture model recovers the weight (w = 0.354 ± 0.010, true 0.35) and the modes.
 
+**05, real data: LG M50T (Kirkaldy et al. 2022, cell D, 25 °C, 0–100 % SoC).** The dataset only contains C/10 *discharge* curves, so this is a discharge-only fit (graphite OCP from Ai 2020, Si OCP from Verbrugge 2016, R inferred). Results are in `results/05_kirkaldy_cellD.csv`. The raw data are not redistributed; download them from Zenodo 10.5281/zenodo.7235857.
+
+| at RPT15 | this work (median [95 % CI]) | published (least squares) |
+|---|---|---|
+| LLI | 16.0 [15.3, 16.7] | 17.1 |
+| LAM_P | 8.5 [7.4, 9.7] | 7.7 |
+| LAM_NE | 18.5 [17.8, 19.2] | 21.5 |
+| LAM_Gr | 14.9 [13.8, 15.9] | 19.8 |
+| LAM_Si | 42.5 [40.4, 44.5] | 31.2 |
+
+LLI and LAM_P agree with the published analysis. How the anode loss is split between graphite and Si does **not** agree, and the credible intervals do not cover the published values. The fit residuals are 7–9 mV RMS and systematic. Together this shows that the Gr/Si split is governed by the choice of component OCPs and by model discrepancy, not by measurement noise. The intervals shown above reflect noise only and are therefore too narrow. The next step is to add a model-discrepancy term and Si-OCP mixtures.
+
 ## Limitations (current version)
 - Only the ohmic polarisation is modelled. Diffusion and charge-transfer overpotentials at C/10–C/20 are not, so residuals are correlated and credible intervals on real data will be too narrow unless a discrepancy term is added (planned).
 - Graphite is treated as hysteresis-free. Si hysteresis is a fixed gap scaled by `hys`; there is no path-dependent (scanning-curve) model yet.
