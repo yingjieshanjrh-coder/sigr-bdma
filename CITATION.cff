@@ -7,3 +7,5 @@ authors:
   - family-names: "Shan"
     given-names: "Yingjie"
 license: MIT
+doi: 10.5281/zenodo.24047660
+repository-code: "https://github.com/yingjieshanjrh-coder/sigr-bdma"

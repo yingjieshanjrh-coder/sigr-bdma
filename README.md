@@ -1,5 +1,7 @@
 # sigr-bdma
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24047660.svg)](https://doi.org/10.5281/zenodo.24047660)
+
 **Bayesian degradation-mode analysis for lithium-ion cells with silicon–graphite blend anodes.**
 
 Degradation-mode analysis (DMA) splits capacity fade into loss of lithium inventory (LLI) and loss of active material (LAM) by fitting low-rate full-cell voltage curves with electrode open-circuit potentials (OCPs). Blend anodes make this hard. Silicon and graphite age at different rates. Silicon has a large lithiation/delithiation hysteresis. And the silicon OCP reported in the literature varies a lot, which changes the answer. `sigr-bdma` handles these problems in a fully Bayesian way:
@@ -64,3 +66,6 @@ When the correct branch OCP and the true R are given, a discharge-only fit is al
 
 ## License
 MIT License. Copyright (c) 2026 Yingjie Shan.
+
+## Citation
+Shan, Y. (2026). *sigr-bdma: Bayesian degradation-mode analysis for Si–graphite blend anodes* (v0.1.0). Zenodo. https://doi.org/10.5281/zenodo.24047660
