@@ -70,6 +70,18 @@ LLI and LAM_P agree with the published analysis. How the anode loss is split bet
 
 **07, measured resistance (cell D).** We extract the instantaneous resistance from the GITT pulses: it rises from 26.4 to 31.6 mΩ over the test. When R is instead inferred from discharge-only data, it climbs to ~70 mΩ, because it absorbs all polarisation, not just the ohmic part. Fixing R at the measured values barely changes the modes: at RPT15, LAM_Si = 40.1 % [37.8, 42.5] vs 31.2 % published. **The Si offset is therefore not a resistance artefact**; it comes from the component OCPs.
 
+**08, OCP sensitivity (cell D, RPT0→RPT15, measured R).** We fit 50 combinations of graphite OCP (Ai2020 plus 4 from the TUM-EES collection) and Si OCP (Verbrugge2016 plus 9 from the TUM-EES collection), each multi-start MAP. Results are in `results/08_ocp_sensitivity_cellD.csv`. Among the 15 physically plausible fits with RMS ≤ 10 mV:
+
+| mode | range across OCP choices | published |
+|---|---|---|
+| LLI | 14.5 – 15.7 | 17.1 |
+| LAM_P | 8.0 – 10.0 | 7.7 |
+| LAM_Si | 37.5 – 46.8 | 31.2 |
+| LAM_NE | 7.2 – 19.6 | 21.5 |
+| **LAM_Gr** | **0.8 – 16.3** | 19.8 |
+
+LLI and LAM_P are robust to the OCP choice. LAM_Gr is not: it changes by a factor of 20 depending on which graphite curve is used. Fit quality does not settle the question either. The three best fits (6.1–6.3 mV, all with the Wetjen graphite) give LAM_Gr ≈ 2.5 %, while fits only ~2 mV worse give ≈ 16 %. No OCP combination reproduces the published LAM_Si (every fit gives ≥ 35 %). The OCP curves come from the TUM-EES DegradationModeAnalysis repository (MIT; cite Rehm et al. 2026 and the original sources) and are not redistributed here.
+
 ## Limitations (current version)
 - Only the ohmic polarisation is modelled. Diffusion and charge-transfer overpotentials at C/10–C/20 are not, so residuals are correlated and credible intervals on real data will be too narrow unless a discrepancy term is added (planned).
 - Graphite is treated as hysteresis-free. Si hysteresis is a fixed gap scaled by `hys`; there is no path-dependent (scanning-curve) model yet.

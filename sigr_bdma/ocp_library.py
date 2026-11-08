@@ -44,3 +44,44 @@ def si_verbrugge2016() -> SiOCP:
     return SiOCP("Si-Verbrugge2016",
                  lambda x: _poly(_SI_LITH, x),
                  lambda x: _poly(_SI_DELITH, x))
+
+
+# ---------------------------------------------------------------------------
+# OCP collection of the TUM-EES DegradationModeAnalysis framework (MIT licence,
+# Rehm et al., J. Power Sources 670 (2026) 239418). Not redistributed here: clone
+# https://github.com/TUM-EES/DegradationModeAnalysis and pass its path. Cite the framework
+# paper AND the original source of each curve (see input_data/*/README in that repo).
+# ---------------------------------------------------------------------------
+def _read_tum_mat(path):
+    import scipy.io as sio
+    m = sio.loadmat(path)
+    s = m[[k for k in m if not k.startswith("__")][0]][0, 0]
+    c = np.ravel(s["normalizedCapacity"][()]).astype(float)
+    v = np.ravel(s["voltage"][()]).astype(float)
+    ok = np.isfinite(c) & np.isfinite(v)
+    c, v = c[ok], v[ok]
+    x = c if np.corrcoef(c, v)[0, 1] < 0 else 1.0 - c      # x = lithiation fraction
+    o = np.argsort(x)
+    x, v = x[o], np.minimum.accumulate(v[o])                # enforce U decreasing in x
+    x, idx = np.unique(x, return_index=True)
+    return x, v[idx]
+
+
+def load_tum_ocps(repo_path):
+    """Returns {'graphite': {name: {'lith': f, 'delith': f}}, 'silicon': {...}} with
+    callables U(x), x = lithiation fraction 0..1. Missing branches are absent."""
+    import glob
+    import os
+    import re
+    out = {"graphite": {}, "silicon": {}}
+    for kind, sub, pat in (("graphite", "graphite", r"Gr_(Lithiation|Delithiation)_(\w+)\.mat"),
+                           ("silicon", "silicon", r"Si(?:Reconstr)?_(Lithiation|Delithiation)_(\w+?)(?:_P45B.*)?\.mat")):
+        for f in glob.glob(os.path.join(repo_path, "input_data", sub, "*.mat")):
+            m = re.match(pat, os.path.basename(f))
+            if not m:
+                continue
+            branch = "lith" if m.group(1) == "Lithiation" else "delith"
+            x, v = _read_tum_mat(f)
+            out[kind].setdefault(m.group(2), {})[branch] = (
+                lambda xx, x=x, v=v: np.interp(xx, x, v))
+    return out
