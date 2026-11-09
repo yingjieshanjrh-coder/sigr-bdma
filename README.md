@@ -33,6 +33,13 @@ post = s.fit_state(cell, branches, {k: 0.95 * v for k, v in truth.items()})
 print(post.summary())
 ```
 
+OCP-sensitivity range for real data (every graphite x silicon combination, R fixed at the measured value):
+```python
+from sigr_bdma.sensitivity import ocp_ensemble, ensemble_summary
+res = ocp_ensemble(graphites, silicons, fresh_branch, aged_branch, R_fresh, R_aged)
+print(ensemble_summary(res, rms_max=10.0))      # n, range, IQR and SD of each mode
+```
+
 ## Synthetic results (`results/`, reproducible with `examples/`)
 These results are **synthetic** (known ground truth, an idealised model and placeholder Si curves). They show what the method can do. They are not yet validated on real cells.
 
@@ -104,6 +111,27 @@ LLI and LAM_P are robust to the OCP choice. LAM_Gr is not: it changes by a facto
 
 **15, cell-specific reference (P45B).** Fitting CU1 → CU9 with the OCPs measured on electrodes harvested from P45B cells (blend anode lithiation/delithiation and NCA) gives LLI = 17.3–18.3 % across charge, discharge and joint fits. This agrees within 1.5 pp with all literature pairs (17.6–19.3 %) and with the published 18.5 %. LAM_NE does not agree: it is 13.7–22.5 % with the cell-specific curves, 7–18 % with the literature pairs and 9.6 % published. The aged-state fits with the pristine blend curve are also poorer (RMS up to 12 mV). This is consistent with a change in blend-OCP shape as silicon is lost, so the pristine blend curve does not provide a ground truth for the anode losses. Results are in `results/15_p45b_cell_specific.csv`.
 
+**16, profile likelihood, fitting window and spread statistics.** Results are in `results/16*` and `figures/fig_profile_QGr.png`.
+- *Profile over Q_Gr* (cells B and D, the three best OCP pairs each): with LAM_Gr fixed anywhere between 0 and 22 % and the other capacities refitted, the aged-state RMS changes by only 1.0–1.8 mV, while LLI moves by at most 1.7 pp. The RMS keeps falling for negative LAM_Gr (an unphysical gain of graphite capacity), and it rises steeply only above 22–28 %. The data therefore give an upper bound on graphite loss, not a value.
+- *Fitting window*: refitting cells B, D and E with 3.0–4.2 V instead of 2.5–4.2 V lowers the best RMS from about 6 to 4–5 mV and leaves the pattern unchanged (LLI spread 1.5–1.7 pp, LAM_Gr 13–14 pp). Cropping to 3.2–4.1 V removes the silicon information (LAM_Si spread 67–84 pp) and also degrades LLI (9–12 pp).
+- *Spread statistics*: the range is driven partly by a few outlying combinations. Median over the 0–100 % cells, the IQR is 1.7 pp for LAM_Gr and 2.8 pp for LAM_Si against 0.5 pp for LLI; the SD is 4.0, 2.3 and 0.4 pp; the range rarefied to five combinations is 11.4, 7.2 and 0.9 pp.
+
+**17, silicon content (synthetic).** Fresh and aged C/10 curves are generated with a known OCP pair for Si capacity shares of 5–35 % and fitted with the rest of the library (the true pair excluded). LLI spreads by at most 1.2 pp at every share. LAM_Si is unconstrained at 5 % Si (28–31 pp) and becomes well constrained as the share grows (2–4 pp at 35 %). LAM_Gr stays OCP-sensitive at every share (3–25 pp, depending on the true pair). Results are in `results/17_si_fraction_summary.csv`.
+
+## Reproducing the paper
+Data: LG M50T from Zenodo 10.5281/zenodo.7235857 (unzip; pass the inner `Battery Degradation Data` folder as `DATA`), and a clone of https://github.com/tum-ees/DegradationModeAnalysis as `TUM`.
+
+| Output | Command |
+|---|---|
+| Tables 1–2, Figs. 1–3 | `python examples/08_ocp_sensitivity.py DATA TUM` (and with `ABJDEFKLM "0-30% SoC"`), then `python examples/09_paper_figures.py` |
+| Noise-only intervals, thresholds | `python examples/07_kirkaldy_measured_R.py DATA`, then `python examples/10_summary_stats.py` |
+| Table 3 (P45B) | `python examples/11_p45b_branches.py TUM` |
+| Known truth, leave-one-out, trajectories | `python examples/12_review_round1.py DATA TUM` |
+| Cathode OCP | `python examples/13_cathode_ocp.py DATA TUM PBPARAM` (PBPARAM: `pbparam/input/data` of https://github.com/paramm-team/pybamm-param) |
+| Cell-specific P45B reference | `python examples/15_p45b_cell_specific.py TUM` |
+| Profile, window, spread statistics, Fig. 5 | `python examples/16_profile_window_spread.py DATA TUM` |
+| Silicon content | `python examples/17_si_fraction.py TUM` |
+
 ## Limitations (current version)
 - Only the ohmic polarisation is modelled. Diffusion and charge-transfer overpotentials at C/10 are not, so residuals are correlated (9–10 mV RMS on the LG M50T data) and the noise-only credible intervals are too narrow. The AR(1) option does not fix this (see 06).
 - Graphite is treated as hysteresis-free. Si hysteresis is a fixed gap scaled by `hys`; there is no path-dependent (scanning-curve) model.
@@ -123,4 +151,4 @@ LLI and LAM_P are robust to the OCP choice. LAM_Gr is not: it changes by a facto
 MIT License. Copyright (c) 2026 Yingjie Shan.
 
 ## Citation
-Shan, Y. (2026). *sigr-bdma: Bayesian degradation-mode analysis for Si–graphite blend anodes* (v0.2.0). Zenodo. https://doi.org/10.5281/zenodo.24066368
+Shan, Y. (2026). *sigr-bdma: Bayesian degradation-mode analysis for Si–graphite blend anodes* (v0.3.0). Zenodo. https://doi.org/10.5281/zenodo.24066368

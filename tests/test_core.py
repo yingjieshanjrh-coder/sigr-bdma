@@ -102,3 +102,32 @@ def test_branch_aware_graphite_and_positive():
     ch = cell.simulate_branch(TRUTH, "charge", I=0.5)
     dis = cell.simulate_branch(TRUTH, "discharge", I=0.5)
     assert ch.span > 3 and dis.span > 3
+
+
+def test_crop_branch_and_spread_stats():
+    from sigr_bdma.sensitivity import crop_branch, rarefied_range, spread_stats
+    cell = s.Cell(s.placeholder_si())
+    br = cell.simulate_branch(TRUTH, "discharge", I=0.5)
+    c = crop_branch(br, 3.0, 4.1)
+    assert abs(c.V[0] - 3.0) < 1e-12 and abs(c.V[-1] - 4.1) < 1e-12
+    assert c.Q[0] == 0 and np.all(np.diff(c.Q) >= 0) and c.span < br.span
+    st = spread_stats([1.0, 2.0, 3.0, 10.0])
+    assert st["range"] == 9.0 and st["n"] == 4 and st["iqr"] < st["range"]
+    assert rarefied_range([1.0, 2.0, 3.0, 10.0], 4) == 9.0
+    assert np.isnan(rarefied_range([1.0, 2.0], 3))
+
+
+def test_ocp_ensemble_and_profile():
+    from sigr_bdma.sensitivity import ocp_ensemble, profile_capacity
+    si = s.placeholder_si()
+    cell = s.Cell(si)
+    aged_truth = dict(TRUTH, Q_Gr=4.6, Q_Si=0.7, Q_Li=5.0)
+    fr = cell.simulate_branch(TRUTH, "discharge", I=0.5)
+    ag = cell.simulate_branch(aged_truth, "discharge", I=0.5)
+    starts = [{k: v * f for k, v in TRUTH.items() if k != "R"} for f in (0.97, 1.03)]
+    res = ocp_ensemble({"g": s.U_graphite}, {"si": si}, fr, ag, 0.03, 0.03, starts=starts)
+    assert len(res) == 1
+    assert abs(res.LAM_Gr.iloc[0] - 8.0) < 0.5 and abs(res.LLI.iloc[0] - 100 * (1 - 5.0 / 5.5)) < 0.5
+    z1 = [res[f"{n}_1"].iloc[0] for n in ("Q_Gr", "Q_Si", "Q_P", "Q_Li")]
+    prof = profile_capacity(cell, ag, 0.03, z1, "Q_Gr", [4.4, 4.6, 4.8])
+    assert prof.rms_mV.idxmin() == 1

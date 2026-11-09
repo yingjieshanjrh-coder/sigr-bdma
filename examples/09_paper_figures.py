@@ -95,3 +95,35 @@ def fig_trajectory(path_csv="results/12d_trajectory_cellD.csv", path="figures/fi
 
 if __name__ == "__main__" and os.path.exists("results/12d_trajectory_cellD.csv"):
     fig_trajectory()
+
+
+AQUA = "#1baf7a"
+
+
+def fig_profile(path_csv="results/16a_profile_QGr.csv", path="figures/fig_profile_QGr.png"):
+    """Aged-state fit RMS when LAM_Gr is fixed and the other capacities are refitted."""
+    d = pd.read_csv(path_csv)
+    fig, axes = plt.subplots(1, 2, figsize=(6.8, 2.6), sharey=True)
+    styles = {"Kunz": (BLUE, "-"), "Rehm2026": (ORANGE, "--"), "Verbrugge2016": (AQUA, ":")}
+    for ax, c in zip(axes, ("B", "D")):
+        g = d[d.cell == c]
+        ax.axvspan(-21, 0, color=GRID, alpha=0.6, lw=0)
+        ax.text(-10, 13.6, "graphite gain\n(unphysical)", ha="center", va="top", color=MUTED, fontsize=7)
+        for si, (col, ls) in styles.items():
+            h = g[g.silicon == si].sort_values("LAM_Gr")
+            ax.plot(h.LAM_Gr, h.rms_mV, color=col, ls=ls, lw=1.6, label=f"Wetjen Gr + {si} Si")
+        ax.set_xlim(-21, 32)
+        ax.set_ylim(0, 14)
+        ax.set_xlabel("LAM$_{Gr}$ fixed at (%)")
+        ax.set_title(f"cell {c} ({TEMPS[c]} °C)", color=INK)
+        ax.grid(color=GRID, lw=0.6)
+    axes[0].set_ylabel("aged-state fit RMS (mV)")
+    axes[0].legend(frameon=False, fontsize=7, loc="lower right")
+    fig.tight_layout()
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    fig.savefig(path, dpi=300)
+    plt.close(fig)
+
+
+if __name__ == "__main__" and os.path.exists("results/16a_profile_QGr.csv"):
+    fig_profile()

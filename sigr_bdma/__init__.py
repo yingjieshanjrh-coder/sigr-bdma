@@ -9,6 +9,7 @@ from .io import branch_from_arrays, pulse_resistance, split_cycler_log  # noqa: 
 from . import io  # noqa: F401
 from .workflow import fit_series, fit_state  # noqa: F401
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 from .ocp_library import graphite_ai2020, si_verbrugge2016  # noqa: F401,E402
 from . import datasets  # noqa: F401,E402
+from . import sensitivity  # noqa: F401,E402
