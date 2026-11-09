@@ -75,3 +75,23 @@ if __name__ == "__main__":
         r030 = pd.read_csv("results/08_ocp_sensitivity_030_all.csv")
         fig_ranges(r030, "figures/fig_mode_ranges_030.png", TEMPS_030)
     print("figures written to figures/")
+
+
+def fig_trajectory(path_csv="results/12d_trajectory_cellD.csv", path="figures/fig_trajectory_cellD.png"):
+    tr = pd.read_csv(path_csv)
+    fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.5), sharex=True)
+    for ax, (m, lab) in zip(axes, [("LLI", "LLI"), ("LAM_Gr", "LAM$_{Gr}$"), ("LAM_Si", "LAM$_{Si}$")]):
+        for _, g in tr.groupby("combo"):
+            ax.plot(g.rpt, g[m], color=BLUE, lw=1.0, alpha=0.55)
+        ax.set_title(lab, color=INK)
+        ax.set_xlabel("RPT")
+        ax.grid(color=GRID, lw=0.6)
+        ax.set_axisbelow(True)
+    axes[0].set_ylabel("loss relative to RPT0 (%)")
+    fig.tight_layout()
+    fig.savefig(path, dpi=300)
+    plt.close(fig)
+
+
+if __name__ == "__main__" and os.path.exists("results/12d_trajectory_cellD.csv"):
+    fig_trajectory()
