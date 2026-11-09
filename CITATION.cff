@@ -6,6 +6,7 @@ date-released: 2026-11-09
 authors:
   - family-names: "Shan"
     given-names: "Yingjie"
+    orcid: "https://orcid.org/0009-0007-6218-1248"
 license: MIT
 doi: 10.5281/zenodo.24090400
 repository-code: "https://github.com/yingjieshanjrh-coder/sigr-bdma"
