@@ -1,6 +1,6 @@
 # sigr-bdma
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24066368.svg)](https://doi.org/10.5281/zenodo.24066368)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24090400.svg)](https://doi.org/10.5281/zenodo.24090400)
 
 **Bayesian degradation-mode analysis for lithium-ion cells with silicon–graphite blend anodes.**
 
