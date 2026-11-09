@@ -1,6 +1,6 @@
 # sigr-bdma
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24047660.svg)](https://doi.org/10.5281/zenodo.24047660)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24066368.svg)](https://doi.org/10.5281/zenodo.24066368)
 
 **Bayesian degradation-mode analysis for lithium-ion cells with silicon–graphite blend anodes.**
 
@@ -113,4 +113,4 @@ LLI and LAM_P are robust to the OCP choice. LAM_Gr is not: it changes by a facto
 MIT License. Copyright (c) 2026 Yingjie Shan.
 
 ## Citation
-Shan, Y. (2026). *sigr-bdma: Bayesian degradation-mode analysis for Si–graphite blend anodes* (v0.1.0). Zenodo. https://doi.org/10.5281/zenodo.24047660
+Shan, Y. (2026). *sigr-bdma: Bayesian degradation-mode analysis for Si–graphite blend anodes* (v0.2.0). Zenodo. https://doi.org/10.5281/zenodo.24066368
