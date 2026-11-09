@@ -151,4 +151,4 @@ Data: LG M50T from Zenodo 10.5281/zenodo.7235857 (unzip; pass the inner `Battery
 MIT License. Copyright (c) 2026 Yingjie Shan.
 
 ## Citation
-Shan, Y. (2026). *sigr-bdma: Bayesian degradation-mode analysis for Si–graphite blend anodes* (v0.3.0). Zenodo. https://doi.org/10.5281/zenodo.24066368
+Shan, Y. (2026). *sigr-bdma: Bayesian degradation-mode analysis for Si–graphite blend anodes* (v0.3.0). Zenodo. https://doi.org/10.5281/zenodo.24090400
