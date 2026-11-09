@@ -91,3 +91,14 @@ def test_pulse_resistance():
     V = 4.0 + np.where(t >= 10, -2.5 * 0.03, 0.0)
     p = s.io.pulse_resistance(t, I, V)
     assert len(p) == 1 and abs(p[0, 2] - 0.03) < 1e-9
+
+
+def test_branch_aware_graphite_and_positive():
+    si = s.placeholder_si()
+    g_d = s.U_graphite
+    g_c = lambda x: s.U_graphite(x) - 0.01
+    cell = s.Cell(si, U_gr={"charge": g_c, "discharge": g_d},
+                  U_pos={"charge": s.U_nmc811, "discharge": s.U_nmc811})
+    ch = cell.simulate_branch(TRUTH, "charge", I=0.5)
+    dis = cell.simulate_branch(TRUTH, "discharge", I=0.5)
+    assert ch.span > 3 and dis.span > 3

@@ -41,13 +41,19 @@ class Cell:
 
     def __init__(self, si_ocps, U_pos=U_nmc811, pos_range=NMC811_RANGE, U_gr=U_graphite,
                  n_inverse=1201):
+        """U_gr / U_pos: a callable, or a dict {"charge": f, "discharge": f} for
+        branch-dependent graphite (lithiation on cell charge) / positive OCPs."""
         if not isinstance(si_ocps, (list, tuple)):
             si_ocps = [si_ocps]
         if len(si_ocps) > 2:
             raise ValueError("use at most two candidate Si OCPs (mixture weight w)")
         self.si_ocps = list(si_ocps)
-        self.U_pos, self.pos_range = U_pos, pos_range
-        self.x_gr = Inverse(U_gr)(self.UN_GRID)          # fixed, precompute
+        # graphite and positive OCPs may be given per branch: {"charge": f, "discharge": f}
+        self.U_pos_by = U_pos if isinstance(U_pos, dict) else {"charge": U_pos, "discharge": U_pos}
+        self.U_pos, self.pos_range = self.U_pos_by["discharge"], pos_range
+        grs = U_gr if isinstance(U_gr, dict) else {"charge": U_gr, "discharge": U_gr}
+        self.x_gr_by = {d: Inverse(f)(self.UN_GRID) for d, f in grs.items()}
+        self.x_gr = self.x_gr_by["discharge"]
         self.n_inverse = n_inverse
         self._cache = {}
 
@@ -66,9 +72,9 @@ class Cell:
     def ocv_curve(self, p, direction):
         """(q_n, OCV, V_meas) ordered by increasing NE lithium."""
         w, hys, R = p.get("w", 0.0), p.get("hys", 1.0), p.get("R", 0.0)
-        q_n = p["Q_Gr"] * self.x_gr + p["Q_Si"] * self._x_si(direction, w, hys)
+        q_n = p["Q_Gr"] * self.x_gr_by[direction] + p["Q_Si"] * self._x_si(direction, w, hys)
         y = (p["Q_Li"] - q_n) / p["Q_P"]
-        ocv = self.U_pos(np.clip(y, *self.pos_range)) - self.UN_GRID
+        ocv = self.U_pos_by[direction](np.clip(y, *self.pos_range)) - self.UN_GRID
         q_n, ocv = q_n[::-1], ocv[::-1]
         ocv = np.maximum.accumulate(ocv) + np.arange(len(ocv)) * 1e-9
         sign = 1.0 if direction == "charge" else -1.0

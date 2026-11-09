@@ -88,10 +88,16 @@ LLI and LAM_P are robust to the OCP choice. LAM_Gr is not: it changes by a facto
 
 **10, robustness.** The output is in `results/10_summary_stats.txt`. Whichever RMS cut-off is used (8–15 mV), LAM_Gr spreads 8–35× more than LLI. For LAM_Gr and LAM_NE, the OCP-induced spread is 4–5× the noise-only 95 % interval of a single-OCP Bayesian fit. For LLI and LAM_P it is smaller than that interval.
 
+**11, second chemistry with both branches: Molicel P45B (NCA | graphite–SiOx).** We use the C/30 pOCV charge and discharge curves at 9 check-ups (0–800 EFC) that ship as test data with the TUM-EES DMA repository, decoded from the MATLAB table without MATLAB (`sigr_bdma.datasets.tum_p45b_branches`). For 40 OCP combinations, each with branch-aware graphite and Si, CU1 → CU9 is fitted from charge only, discharge only, and both branches jointly. Results are in `results/11_p45b_branches.csv`.
+- LLI is again robust: it spreads 0.2–1.5 pp in every configuration.
+- LAM_Si is poorly constrained from the charge branch alone (spread 21–38 pp across OCP choices) but well constrained from the discharge branch (3.5–4 pp).
+- LAM_Gr remains fragile in all three configurations (spread 6–20 pp).
+- On these data the joint fit does **not** narrow the spread further than discharge alone. Its residuals are larger (≥ 8.7 mV), which shows that the literature branch-OCP pairs are not mutually consistent for this cell.
+
 ## Limitations (current version)
 - Only the ohmic polarisation is modelled. Diffusion and charge-transfer overpotentials at C/10 are not, so residuals are correlated (9–10 mV RMS on the LG M50T data) and the noise-only credible intervals are too narrow. The AR(1) option does not fix this (see 06).
 - Graphite is treated as hysteresis-free. Si hysteresis is a fixed gap scaled by `hys`; there is no path-dependent (scanning-curve) model.
-- The Kirkaldy et al. dataset contains C/10 discharge curves only, so the joint charge/discharge fit has so far been tested on synthetic data only.
+- The joint charge/discharge fit has been tested on one real cell (P45B, example 11), where it did not outperform a discharge-only fit.
 - The `placeholder_si` curves are for tests only. Real analyses use `si_verbrugge2016`, `graphite_ai2020` or the TUM-EES collection (`load_tum_ocps`).
 
 ## Related work

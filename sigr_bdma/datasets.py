@@ -70,3 +70,61 @@ def kirkaldy2022_resistance(root, cell, soc="0-100% SoC"):
 def interpolate_resistance(R_by_rpt, rpts):
     k = np.array(list(R_by_rpt)); v = np.array(list(R_by_rpt.values()))
     return {r: float(np.interp(r, k, v)) for r in rpts}
+
+
+# ---------------------------------------------------------------------------
+# Molicel P45B test data of the TUM-EES DegradationModeAnalysis repository
+# (input_data/test_data/P45B_serial23_aging_data_table.mat, a MATLAB table object).
+# ---------------------------------------------------------------------------
+def _matlab_table_objects(path):
+    """Decode the MCOS object store of a MATLAB table saved with -v7 (no MATLAB needed).
+    Returns the list of object-metadata cells."""
+    import io
+
+    import scipy.io as sio
+    from scipy.io.matlab._mio5 import MatFile5Reader
+    raw = sio.loadmat(path)["__function_workspace__"].tobytes()
+    hdr = b"MATLAB 5.0 MAT-file".ljust(116, b" ") + b"\x00" * 8 + b"\x00\x01IM"
+    r = MatFile5Reader(io.BytesIO(hdr + raw[8:]), struct_as_record=False, squeeze_me=False)
+    r.mat_stream.seek(0)
+    r.initialize_read()
+    r.mat_stream.seek(128)
+    h, _ = r.read_var_header()
+    top = r.read_var_array(h, process=True)[0, 0]
+    return list(np.asarray(top.MCOS[0]["_ObjectMetadata"]).ravel())
+
+
+def tum_p45b_branches(repo_path, n=300):
+    """List (one per check-up) of {"charge": Branch, "discharge": Branch} for the P45B
+    cell (C/30 pOCV in both directions, 9 check-ups, 0-800 EFC)."""
+    cells = _matlab_table_objects(os.path.join(
+        repo_path, "input_data", "test_data", "P45B_serial23_aging_data_table.mat"))
+    curves = []
+    for c in cells:
+        a = np.asarray(c)
+        if a.dtype != object or a.size != 1:
+            continue
+        o = a.ravel()[0]
+        if not hasattr(o, "_fieldnames") or "data" not in o._fieldnames:
+            continue
+        U, I, Ah = (np.asarray(x).ravel() for x in o.data.ravel())
+        curves.append((U, I, Ah))
+    ch = [c for c in curves if c[1].mean() > 0]
+    dch = [c for c in curves if c[1].mean() < 0]
+    out = []
+    for (Uc, Ic, Ac), (Ud, Id, Ad) in zip(ch, dch):
+        out.append({"charge": branch_from_arrays(np.abs(Ac), Uc, "charge", abs(Ic.mean()), n),
+                    "discharge": branch_from_arrays(np.abs(Ad), Ud, "discharge", abs(Id.mean()), n)})
+    return out
+
+
+def tum_p45b_published(repo_path, cu=9):
+    """Degradation modes (%) reported by the TUM-EES framework for the P45B test cell
+    (charge-direction fit) at check-up `cu` relative to CU1."""
+    import scipy.io as sio
+    d = sio.loadmat(os.path.join(repo_path, "input_data", "test_data", "results",
+                                 "P45B_parameters.mat"), squeeze_me=True, struct_as_record=False)
+    c = getattr(d["data"], f"CU{cu}")
+    return {"LAM_Gr": 100 * float(c.lamAnodeBlend1), "LAM_Si": 100 * float(c.lamAnodeBlend2),
+            "LAM_NE": 100 * float(c.lamAnode), "LAM_P": 100 * float(c.lamCathode),
+            "LLI": 100 * float(c.li)}
