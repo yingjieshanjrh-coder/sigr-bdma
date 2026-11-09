@@ -94,6 +94,14 @@ LLI and LAM_P are robust to the OCP choice. LAM_Gr is not: it changes by a facto
 - LAM_Gr remains fragile in all three configurations (spread 6–20 pp).
 - On these data the joint fit does **not** narrow the spread further than discharge alone. Its residuals are larger (≥ 8.7 mV), which shows that the literature branch-OCP pairs are not mutually consistent for this cell.
 
+**12–13, robustness checks.** Results are in `results/12*`, `results/13_cathode_ocp.csv` and `figures/fig_trajectory_cellD.png`.
+- *Known truth*: synthetic curves are generated with one OCP pair and fitted with all 50. When the true pair is in the library, the lowest-RMS fit recovers it every time, with errors below 0.3 pp. When it is not, fits at 6–10 mV RMS give LAM_Gr errors of up to about 11 pp but LLI errors of at most 1.6 pp.
+- *Leave one curve out*: removing any single curve leaves the LAM_Gr spread at 7.5 pp or more, still at least 6× the LLI spread.
+- *RMS vs LAM_Gr*: the Spearman ρ lies between −0.22 and 0.15 in all eight cells, and none is significant.
+- *Multiple optima*: a single OCP pair (Wetjen graphite + Kunz Si) gives LAM_Gr = 2.5 % or 14.5 % depending on the optimisation path, with RMS 7.58 vs 7.81 mV.
+- *Trajectories*: across 16 RPTs of cell D, LLI curves almost coincide while LAM_Gr curves diverge. Two OCP pairs give non-monotonic (unphysical) LAM_Gr.
+- *Positive-electrode OCP*: replacing Chen2020 by an LG M36 coin-cell curve leaves the anode picture unchanged but shifts LLI by +3 to +4 pp.
+
 ## Limitations (current version)
 - Only the ohmic polarisation is modelled. Diffusion and charge-transfer overpotentials at C/10 are not, so residuals are correlated (9–10 mV RMS on the LG M50T data) and the noise-only credible intervals are too narrow. The AR(1) option does not fix this (see 06).
 - Graphite is treated as hysteresis-free. Si hysteresis is a fixed gap scaled by `hys`; there is no path-dependent (scanning-curve) model.
