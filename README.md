@@ -102,6 +102,8 @@ LLI and LAM_P are robust to the OCP choice. LAM_Gr is not: it changes by a facto
 - *Trajectories*: across 16 RPTs of cell D, LLI curves almost coincide while LAM_Gr curves diverge. Two OCP pairs give non-monotonic (unphysical) LAM_Gr.
 - *Positive-electrode OCP*: replacing Chen2020 by an LG M36 coin-cell curve leaves the anode picture unchanged but shifts LLI by +3 to +4 pp.
 
+**15, cell-specific reference (P45B).** Fitting CU1 → CU9 with the OCPs measured on electrodes harvested from P45B cells (blend anode lithiation/delithiation and NCA) gives LLI = 17.3–18.3 % across charge, discharge and joint fits. This agrees within 1.5 pp with all literature pairs (17.6–19.3 %) and with the published 18.5 %. LAM_NE does not agree: it is 13.7–22.5 % with the cell-specific curves, 7–18 % with the literature pairs and 9.6 % published. The aged-state fits with the pristine blend curve are also poorer (RMS up to 12 mV). This is consistent with a change in blend-OCP shape as silicon is lost, so the pristine blend curve does not provide a ground truth for the anode losses. Results are in `results/15_p45b_cell_specific.csv`.
+
 ## Limitations (current version)
 - Only the ohmic polarisation is modelled. Diffusion and charge-transfer overpotentials at C/10 are not, so residuals are correlated (9–10 mV RMS on the LG M50T data) and the noise-only credible intervals are too narrow. The AR(1) option does not fix this (see 06).
 - Graphite is treated as hysteresis-free. Si hysteresis is a fixed gap scaled by `hys`; there is no path-dependent (scanning-curve) model.
