@@ -123,14 +123,16 @@ Data: LG M50T from Zenodo 10.5281/zenodo.7235857 (unzip; pass the inner `Battery
 
 | Output | Command |
 |---|---|
-| Tables 1–2, Figs. 1–3 | `python examples/08_ocp_sensitivity.py DATA TUM` (and with `ABJDEFKLM "0-30% SoC"`), then `python examples/09_paper_figures.py` |
+| Fig. 1 (OCP library) | `python examples/18_ocp_library_figure.py TUM` |
+| Tables 1–2, Figs. 2, 3 and 5 | `python examples/08_ocp_sensitivity.py DATA TUM` (and with `ABJDEFKLM "0-30% SoC"`), then `python examples/09_paper_figures.py` |
 | Noise-only intervals, thresholds | `python examples/07_kirkaldy_measured_R.py DATA`, then `python examples/10_summary_stats.py` |
 | Table 3 (P45B) | `python examples/11_p45b_branches.py TUM` |
-| Known truth, leave-one-out, trajectories | `python examples/12_review_round1.py DATA TUM` |
+| Known truth, leave-one-out, trajectories (Table 4, Fig. 6) | `python examples/12_review_round1.py DATA TUM`, then `python examples/09_paper_figures.py` |
 | Cathode OCP | `python examples/13_cathode_ocp.py DATA TUM PBPARAM` (PBPARAM: `pbparam/input/data` of https://github.com/paramm-team/pybamm-param) |
 | Cell-specific P45B reference | `python examples/15_p45b_cell_specific.py TUM` |
-| Profile, window, spread statistics, Fig. 5 | `python examples/16_profile_window_spread.py DATA TUM` |
+| Profile, window, spread statistics, Fig. 4 | `python examples/16_profile_window_spread.py DATA TUM`, then `python examples/09_paper_figures.py` |
 | Silicon content | `python examples/17_si_fraction.py TUM` |
+| Graphical abstract | `python examples/19_graphical_abstract.py` |
 
 ## Limitations (current version)
 - Only the ohmic polarisation is modelled. Diffusion and charge-transfer overpotentials at C/10 are not, so residuals are correlated (9–10 mV RMS on the LG M50T data) and the noise-only credible intervals are too narrow. The AR(1) option does not fix this (see 06).

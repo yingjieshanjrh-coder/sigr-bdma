@@ -12,9 +12,22 @@ TEMPS = {"A": 10, "B": 10, "C": 10, "D": 25, "E": 25, "F": 40, "G": 40, "H": 40}
 TEMPS_030 = {"A": 10, "B": 10, "J": 10, "D": 25, "E": 25, "F": 25, "K": 40, "L": 40, "M": 40}
 MODES = [("LLI", "LLI"), ("LAM_P", "LAM$_{PE}$"), ("LAM_Si", "LAM$_{Si}$"),
          ("LAM_NE", "LAM$_{NE}$"), ("LAM_Gr", "LAM$_{Gr}$")]
-plt.rcParams.update({"font.size": 8, "axes.edgecolor": MUTED, "axes.labelcolor": INK,
+plt.rcParams.update({"pdf.fonttype": 42, "font.size": 8, "axes.edgecolor": MUTED, "axes.labelcolor": INK,
                      "xtick.color": MUTED, "ytick.color": MUTED, "axes.spines.top": False,
                      "axes.spines.right": False, "font.family": "DejaVu Sans"})
+
+
+def panel_letters(axes):
+    """Label the panels (a), (b), ... at the top left, on the title line."""
+    for k, ax in enumerate(axes):
+        ax.annotate(f"({chr(97 + k)})", xy=(0, 1), xycoords="axes fraction", xytext=(0, 6),
+                    textcoords="offset points", ha="left", va="baseline", fontsize=10, color="black")
+
+
+def save(fig, path):
+    fig.savefig(path, dpi=300)
+    fig.savefig(os.path.splitext(path)[0] + ".pdf")
+    plt.close(fig)
 
 
 def plausible(r, rms_max=10.0):
@@ -43,8 +56,8 @@ def fig_ranges(res, path, temps=TEMPS):
     fig.legend([h1, h2], ["range over OCP choices (fits ≤ 10 mV)", "published (least squares)"],
                frameon=False, loc="upper center", ncol=2, fontsize=7)
     fig.tight_layout(rect=(0, 0, 1, 0.9))
-    fig.savefig(path, dpi=300)
-    plt.close(fig)
+    panel_letters(axes)
+    save(fig, path)
 
 
 def fig_rms_vs_gr(res, path, cells=("B", "D")):
@@ -62,8 +75,8 @@ def fig_rms_vs_gr(res, path, cells=("B", "D")):
     axes[0].set_ylabel("LAM$_{Gr}$ at RPT15 (%)")
     axes[0].legend(frameon=False, fontsize=7)
     fig.tight_layout()
-    fig.savefig(path, dpi=300)
-    plt.close(fig)
+    panel_letters(axes)
+    save(fig, path)
 
 
 if __name__ == "__main__":
@@ -89,8 +102,8 @@ def fig_trajectory(path_csv="results/12d_trajectory_cellD.csv", path="figures/fi
         ax.set_axisbelow(True)
     axes[0].set_ylabel("loss relative to RPT0 (%)")
     fig.tight_layout()
-    fig.savefig(path, dpi=300)
-    plt.close(fig)
+    panel_letters(axes)
+    save(fig, path)
 
 
 if __name__ == "__main__" and os.path.exists("results/12d_trajectory_cellD.csv"):
@@ -121,8 +134,8 @@ def fig_profile(path_csv="results/16a_profile_QGr.csv", path="figures/fig_profil
     axes[0].legend(frameon=False, fontsize=7, loc="lower right")
     fig.tight_layout()
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    fig.savefig(path, dpi=300)
-    plt.close(fig)
+    panel_letters(axes)
+    save(fig, path)
 
 
 if __name__ == "__main__" and os.path.exists("results/16a_profile_QGr.csv"):
