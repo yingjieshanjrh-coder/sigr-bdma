@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "sigr-bdma: Bayesian degradation-mode analysis for Si-graphite blend anodes"
-version: 0.3.0
-date-released: 2026-11-09
+version: 0.3.1
+date-released: 2026-11-13
 authors:
   - family-names: "Shan"
     given-names: "Yingjie"

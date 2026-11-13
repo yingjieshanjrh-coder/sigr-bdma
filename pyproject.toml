@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sigr-bdma"
-version = "0.3.0"
+version = "0.3.1"
 authors = [{name = "Yingjie Shan", email = "yingjieshanjrh@gmail.com"}]
 description = "Bayesian degradation-mode analysis for Si-graphite blend anodes"
 readme = "README.md"

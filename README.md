@@ -91,14 +91,14 @@ LLI and LAM_P are robust to the OCP choice. LAM_Gr is not: it changes by a facto
 
 **08b, all eight cells.** Same 50-combination study for every cell (RPT0 vs RPT15, GITT-measured R). Results are in `results/08_ocp_sensitivity_summary.csv`. Across cells, the median spread due to OCP choice alone is LAM_Gr 12.3 pp, LAM_NE 9.3 pp, LAM_Si 7.8 pp, LAM_P 2.0 pp and LLI 1.2 pp. For the 10 °C and 25 °C cells (A–E), LAM_Gr ranges over 10–15 pp. For the 40 °C cells (F–H), only 2–3 combinations fit within 10 mV, so the spread there is not well sampled. In all eight cells, LLI is 1–4 pp below the published value and LAM_Si is 2–12 pp above it.
 
-**08c, 0–30 % SoC cells (9 cells, RPT0 vs last RPT).** Results are in `results/08_ocp_sensitivity_030_summary.csv` and `figures/fig_mode_ranges_030.png`. The picture is the same: the median spread is LLI 1.4 pp, LAM_P 2.8 pp, LAM_Si 9.7 pp, LAM_NE 16.0 pp and LAM_Gr 19.3 pp. In the strongly degraded cells (LLI 40–54 %), LLI and LAM_P agree with the published values to within about 2–4 pp, while LAM_NE and LAM_Gr are 15–40 pp lower than published.
+**08c, 0–30 % SoC cells (9 cells, RPT0 vs last RPT).** Results are in `results/08_ocp_sensitivity_030_summary.csv` and `figures/fig_mode_ranges_030.png`. The picture is the same: the median spread is LLI 1.4 pp, LAM_P 2.8 pp, LAM_Si 9.7 pp, LAM_NE 16.0 pp and LAM_Gr 19.3 pp. In the strongly degraded cells (LLI 40–54 %), LLI agrees with the published values to within 2 pp and LAM_P to within 5 pp, while LAM_NE is 16–36 pp and LAM_Gr 21–46 pp lower than published.
 
 **10, robustness.** The output is in `results/10_summary_stats.txt`. Whichever RMS cut-off is used (8–15 mV), LAM_Gr spreads 8–35× more than LLI. For LAM_Gr and LAM_NE, the OCP-induced spread is 4–5× the noise-only 95 % interval of a single-OCP Bayesian fit. For LLI and LAM_P it is smaller than that interval.
 
 **11, second chemistry with both branches: Molicel P45B (NCA | graphite–SiOx).** We use the C/30 pOCV charge and discharge curves at 9 check-ups (0–800 EFC) that ship as test data with the TUM-EES DMA repository, decoded from the MATLAB table without MATLAB (`sigr_bdma.datasets.tum_p45b_branches`). For 40 OCP combinations, each with branch-aware graphite and Si, CU1 → CU9 is fitted from charge only, discharge only, and both branches jointly. Results are in `results/11_p45b_branches.csv`.
-- LLI is again robust: it spreads 0.2–1.5 pp in every configuration.
-- LAM_Si is poorly constrained from the charge branch alone (spread 21–38 pp across OCP choices) but well constrained from the discharge branch (3.5–4 pp).
-- LAM_Gr remains fragile in all three configurations (spread 6–20 pp).
+- LLI is again robust: it spreads by less than 1 pp over the five best fits of each configuration and by at most 1.6 pp over all fits with RMS ≤ 10 mV.
+- LAM_Si is poorly constrained from the charge branch alone (spread 21.5 pp over the five best fits, 38 pp over fits with RMS ≤ 10 mV) but much better from the discharge branch (3.5 pp and 8 pp).
+- LAM_Gr remains fragile in all three configurations (spread 9–14 pp over the five best fits).
 - On these data the joint fit does **not** narrow the spread further than discharge alone. Its residuals are larger (≥ 8.7 mV), which shows that the literature branch-OCP pairs are not mutually consistent for this cell.
 
 **12–13, robustness checks.** Results are in `results/12*`, `results/13_cathode_ocp.csv` and `figures/fig_trajectory_cellD.png`.
@@ -106,8 +106,8 @@ LLI and LAM_P are robust to the OCP choice. LAM_Gr is not: it changes by a facto
 - *Leave one curve out*: removing any single curve leaves the LAM_Gr spread at 7.5 pp or more, still at least 6× the LLI spread.
 - *RMS vs LAM_Gr*: the Spearman ρ lies between −0.22 and 0.15 in all eight cells, and none is significant.
 - *Multiple optima*: a single OCP pair (Wetjen graphite + Kunz Si) gives LAM_Gr = 2.5 % or 14.5 % depending on the optimisation path, with RMS 7.58 vs 7.81 mV.
-- *Trajectories*: across 16 RPTs of cell D, LLI curves almost coincide while LAM_Gr curves diverge. Two OCP pairs give non-monotonic (unphysical) LAM_Gr.
-- *Positive-electrode OCP*: replacing Chen2020 by an LG M36 coin-cell curve leaves the anode picture unchanged but shifts LLI by +3 to +4 pp.
+- *Trajectories*: across 16 RPTs of cell D, LLI curves almost coincide while LAM_Gr curves diverge. For two OCP pairs LAM_Gr falls by more than 2 pp between consecutive RPTs (unphysical).
+- *Positive-electrode OCP*: replacing Chen2020 by an LG M36 coin-cell curve leaves the anode picture unchanged but shifts the median LLI by +2.8 pp (cell D) and +4.0 pp (cell B).
 
 **15, cell-specific reference (P45B).** Fitting CU1 → CU9 with the OCPs measured on electrodes harvested from P45B cells (blend anode lithiation/delithiation and NCA) gives LLI = 17.3–18.3 % across charge, discharge and joint fits. This agrees within 1.5 pp with all literature pairs (17.6–19.3 %) and with the published 18.5 %. LAM_NE does not agree: it is 13.7–22.5 % with the cell-specific curves, 7–18 % with the literature pairs and 9.6 % published. The aged-state fits with the pristine blend curve are also poorer (RMS up to 12 mV). This is consistent with a change in blend-OCP shape as silicon is lost, so the pristine blend curve does not provide a ground truth for the anode losses. Results are in `results/15_p45b_cell_specific.csv`.
 
